@@ -17,8 +17,9 @@
  *    shallowCopy({a: 2, b: { a: [1, 2, 3]}}) => {a: 2, b: { a: [1, 2, 3]}}
  *    shallowCopy({}) => {}
  */
-function shallowCopy(/* obj */) {
-  throw new Error('Not implemented');
+function shallowCopy(obj) {
+  const a = {};
+  return Object.assign(a, obj);
 }
 
 /**
@@ -32,10 +33,31 @@ function shallowCopy(/* obj */) {
  *    mergeObjects([{a: 1, b: 2}, {b: 3, c: 5}]) => {a: 1, b: 5, c: 5}
  *    mergeObjects([]) => {}
  */
-function mergeObjects(/* objects */) {
-  throw new Error('Not implemented');
+function mergeObjects(objects) {
+  const arr = [];
+  objects.forEach((object) => {
+    arr.push(Object.entries(object));
+  });
+  let i = 0;
+  const result = {};
+  while (i < arr.length) {
+    let y = 0;
+    while (y < arr[i].length) {
+      if (Object.hasOwn(result, arr[i][y][0])) {
+        result[arr[i][y][0]] += arr[i][y][1];
+      } else {
+        [, result[arr[i][y][0]]] = arr[i][y];
+      }
+      y += 1;
+    }
+    i += 1;
+  }
+  return result;
 }
-
+mergeObjects([
+  { a: 1, b: 2 },
+  { b: 3, c: 5 },
+]);
 /**
  * Removes a properties from an object.
  *
@@ -49,8 +71,14 @@ function mergeObjects(/* objects */) {
  *    removeProperties({name: 'John', age: 30, city: 'New York'}, 'age') => {name: 'John', city: 'New York'}
  *
  */
-function removeProperties(/* obj, keys */) {
-  throw new Error('Not implemented');
+function removeProperties(obj, keys) {
+  const copy = obj;
+  let i = 0;
+  while (i < keys.length) {
+    delete copy[keys[i]];
+    i += 1;
+  }
+  return copy;
 }
 
 /**
@@ -65,8 +93,23 @@ function removeProperties(/* obj, keys */) {
  *    compareObjects({a: 1, b: 2}, {a: 1, b: 2}) => true
  *    compareObjects({a: 1, b: 2}, {a: 1, b: 3}) => false
  */
-function compareObjects(/* obj1, obj2 */) {
-  throw new Error('Not implemented');
+function compareObjects(obj1, obj2) {
+  const arr1 = Object.entries(obj1);
+  const arr2 = Object.entries(obj2);
+  let length;
+  if (obj1.length > obj2.length) {
+    length = arr1.length;
+  } else {
+    length = arr2.length;
+  }
+  let i = 0;
+  while (i < length) {
+    if (arr1[i][0] !== arr2[i][0] || arr1[i][1] !== arr2[i][1]) {
+      return false;
+    }
+    i += 1;
+  }
+  return true;
 }
 
 /**
@@ -80,10 +123,9 @@ function compareObjects(/* obj1, obj2 */) {
  *    isEmptyObject({}) => true
  *    isEmptyObject({a: 1}) => false
  */
-function isEmptyObject(/* obj */) {
-  throw new Error('Not implemented');
+function isEmptyObject(obj) {
+  return Object.keys(obj).length === 0;
 }
-
 /**
  * Makes the source object immutable by preventing any changes to its properties.
  *
@@ -100,8 +142,8 @@ function isEmptyObject(/* obj */) {
  *    immutableObj.newProp = 'new';
  *    console.log(immutableObj) => {a: 1, b: 2}
  */
-function makeImmutable(/* obj */) {
-  throw new Error('Not implemented');
+function makeImmutable(obj) {
+  return Object.freeze(obj);
 }
 
 /**
@@ -114,8 +156,18 @@ function makeImmutable(/* obj */) {
  *    makeWord({ a: [0, 1], b: [2, 3], c: [4, 5] }) => 'aabbcc'
  *    makeWord({ H:[0], e: [1], l: [2, 3, 8], o: [4, 6], W:[5], r:[7], d:[9]}) => 'HelloWorld'
  */
-function makeWord(/* lettersObject */) {
-  throw new Error('Not implemented');
+function makeWord(lettersObject) {
+  const arr = Object.entries(lettersObject);
+  const result = [];
+  let i = 0;
+  while (i < arr.length) {
+    const letter = arr[i][0];
+    arr[i][1].forEach((number) => {
+      result[number] = letter;
+    });
+    i += 1;
+  }
+  return result.join('');
 }
 
 /**
@@ -132,8 +184,30 @@ function makeWord(/* lettersObject */) {
  *    sellTickets([25, 25, 50]) => true
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
-function sellTickets(/* queue */) {
-  throw new Error('Not implemented');
+function sellTickets(queue) {
+  const money = {
+    25: 0,
+    50: 0,
+    100: 0,
+  };
+  let i = 0;
+  while (i < queue.length) {
+    if (queue[i] === 25) {
+      money['25'] += 1;
+    } else if (queue[i] === 50) {
+      if (money['25'] === 0) {
+        return false;
+      }
+      money['25'] -= 1;
+    } else if (money['25'] > 0 && money['50'] > 0) {
+      money['25'] -= 1;
+      money['50'] -= 1;
+    } else {
+      return false;
+    }
+    i += 1;
+  }
+  return true;
 }
 
 /**
